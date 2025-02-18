@@ -1,0 +1,7 @@
+@backend_HostAddress = https://localhost:7224
+
+### Upload a file to the server
+@fileupload = api/xml/fileupload
+curl -X POST -k -F "file=@E:\Udemy\NAM.NET-repos\XML-Learning\XSLTDemo\students.xml" https://localhost:7224/api/XML/fileupload
+
+###

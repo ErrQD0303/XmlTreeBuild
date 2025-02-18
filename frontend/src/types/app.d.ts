@@ -1,0 +1,1 @@
+// ../types/app.d.ts

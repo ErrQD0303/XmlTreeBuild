@@ -1,0 +1,12 @@
+Class Models:
+XMLAttribute:
+XMLElement: Parent, Name, Text, List<Attribute>, List<XMLElement>
+XMLElementList: List<XmlElement>
+XMLDocument: Root
+
+Naming Check:
+XMLElement:
+ - Can have letters, digits or underscores
+ - Can not start with digit
+ - Can not start with any type of xml in any cases
+ - Can not contain spaces
