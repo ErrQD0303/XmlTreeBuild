@@ -33,10 +33,10 @@ public partial class XMLUtils
         }
     }
 
-    [GeneratedRegex(@"^(?i)(?!xml)(?-i)[a-zA-Z_][a-zA-Z0-9_-]*$")]
+    [GeneratedRegex(@"^(?i)(?!xml)(?-i)[a-zA-Z_][a-zA-Z0-9_\-:]*$")]
     private static partial Regex ValidateElementNameRegex();
 
-    [GeneratedRegex(@"^[a-zA-Z_][a-zA-Z0-9_-]*$")]
+    [GeneratedRegex(@"^[a-zA-Z_][a-zA-Z0-9_\-:]*$")]
     private static partial Regex ValidateAttributeNameRegex();
 
 
@@ -50,17 +50,22 @@ public partial class XMLUtils
         return stream;
     }
 
-    public static List<XMLAttribute> ParseAttributes(StreamReader sr, char endTagChar)
+    public static List<XMLAttribute> ParseAttributes(StreamReader sr, params char[] endTagChars)
     {
         var attributes = new List<XMLAttribute>();
+
+        /* if (endTagChars.Any(c => c == Convert.ToChar(sr.Peek())))
+        {
+            return attributes;
+        } */
         var currentAttributeName = string.Empty;
         var currentAttributeValue = string.Empty;
-        while (sr.Peek() != -1 && Convert.ToChar(sr.Peek()) != endTagChar)
+        while (sr.Peek() != -1 && endTagChars.All(c => c != Convert.ToChar(sr.Peek())))
         {
             if (string.IsNullOrEmpty(currentAttributeName))
             {
                 RemoveWhitespace(sr);
-                currentAttributeName = ReadAttributeName(sr, '=');
+                currentAttributeName = ReadAttributeName(sr);
 
                 RemoveWhitespace(sr);
                 sr.Read(); // Remove the '=' character
@@ -75,7 +80,10 @@ public partial class XMLUtils
                 }
 
                 RemoveWhitespace(sr);
-                sr.Read(); // Remove the end tag character
+                while (sr.Peek() != -1 && endTagChars.Any(c => c == Convert.ToChar(sr.Peek())))
+                {
+                    sr.Read();
+                }
 
                 attributes.Add(new XMLAttribute(currentAttributeName, currentAttributeValue));
                 currentAttributeName = currentAttributeValue = string.Empty;
@@ -93,10 +101,11 @@ public partial class XMLUtils
         }
     }
 
-    public static string ReadAttributeName(StreamReader sr, char endTagChar)
+    public static string ReadAttributeName(StreamReader sr)
     {
         string name = string.Empty;
-        while (char.IsLetterOrDigit(Convert.ToChar(sr.Peek())) || Convert.ToChar(sr.Peek()) == '_')
+        var allowChars = new[] { '_', '-', ':' };
+        while (char.IsLetterOrDigit(Convert.ToChar(sr.Peek())) || allowChars.Any(c => c == Convert.ToChar(sr.Peek())))
         {
             name += Convert.ToChar(sr.Read());
         }
@@ -104,10 +113,10 @@ public partial class XMLUtils
         return name.ToLower();
     }
 
-    public static string ReadAttributeValue(StreamReader sr, char endTagChar = '"')
+    public static string ReadAttributeValue(StreamReader sr, params char[] endTagChars)
     {
         string value = string.Empty;
-        while (sr.Peek() != -1 && Convert.ToChar(sr.Peek()) != endTagChar)
+        while (sr.Peek() != -1 && endTagChars.All(c => c != Convert.ToChar(sr.Peek())))
         {
             value += Convert.ToChar(sr.Read());
         }

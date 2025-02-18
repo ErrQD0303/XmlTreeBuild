@@ -1,9 +1,10 @@
+using System.Text;
+
 namespace XMLParser.Models;
 
 public abstract class XMLElement
 {
     protected string _name = string.Empty;
-    protected string? _text;
     public virtual string Name
     {
         get => _name;
@@ -13,23 +14,24 @@ public abstract class XMLElement
             _name = value;
         }
     }
-    public string? Text
+    public virtual string? Text
     {
-        get => _text;
-        set
+        get
         {
-            _text = value;
+            var text = "";
+            foreach (var child in Children.Where(c => c is XMLTextElement))
+            {
+                text += child.Text;
+            }
+
+            return text;
         }
     }
+
+    public XMLElement? Parent { get; set; }
+
     public List<XMLElement> Children { get; set; } = [];
     public List<XMLAttribute> Attributes { get; set; } = [];
-
-    public XMLElement(string name, string text
-    )
-    {
-        Name = name;
-        Text = text;
-    }
 
     public XMLElement(string name)
     {
@@ -48,6 +50,26 @@ public abstract class XMLElement
 
     public override string ToString()
     {
-        return Name;
+        var sb = new StringBuilder();
+
+        sb.Append($"<{Name}");
+        if (Attributes.Count > 0)
+        {
+            sb.Append(' ');
+            sb.Append(string.Join(" ", Attributes.Select(a => a.ToString())));
+        }
+        sb.Append('>');
+
+        foreach (var child in Children)
+        {
+            foreach (var line in child.ToString().Split('\n'))
+            {
+                sb.Append($"\n\t{line}");
+            }
+        }
+
+        sb.Append($"\n</{Name}>");
+
+        return sb.ToString();
     }
 }

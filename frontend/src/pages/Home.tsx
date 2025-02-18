@@ -30,7 +30,7 @@ function Home() {
         encType="multipart/form-data"
       >
         <input type="file" name="file" />
-        <button type="submit">Upload ProLog Only</button>
+        <button type="submit">Upload XML Declaration Only</button>
       </form>
     </>
   );

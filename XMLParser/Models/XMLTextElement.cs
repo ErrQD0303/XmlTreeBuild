@@ -5,10 +5,12 @@ using System.Threading.Tasks;
 
 namespace XMLParser.Models
 {
-    public class TextElement : XMLElement
+    public class XMLTextElement : XMLElement
     {
-        public TextElement(string text) : base(string.Empty, text)
+        public override string Text { get; }
+        public XMLTextElement(string text) : base("text")
         {
+            Text = text;
         }
 
         public override string Name => _name;
